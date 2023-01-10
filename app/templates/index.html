@@ -1,0 +1,1233 @@
+{%  extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ conf.site_title }}{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {% if name == 'Guest' %}
+        <script src="{{ url_for('static', filename='js/snow-fall.js') }}"></script>
+    {% endif %}
+    {% if stage == 4 %}
+        <script src="{{ url_for('static', filename='js/jigsaw.js') }}"></script>
+    {% endif %}
+{% endblock %}
+
+{% block page_content %}
+
+{% if name == 'Guest' %}
+    <div class="page-header">
+       <div class="row">
+           <div class="col-md-12">
+               <div align="center"><img alt="Welcome to {{ conf.site_title }}!" src="{{ url_for('static', filename='img/title2023.png') }}" /></div>
+           </div>
+       </div>
+    </div>
+   <div class="row">
+       <div class="col-md-12">
+            <br /><p class="lead text-muted">This quest was created «just for fun» and consists of 23 puzzles of various complexity.
+                While some of the questions might sound complicated or technical, never give up, use your knowledge, or look up the answer on the internet.
+                All of them can be solved without any hints, but the hints are available for the majority of questions.
+                The time to complete the quest depends on your skills and can vary from a few minutes to a few days
+                (the quest is available from 14<sup>th</sup> of December 2022 till 10<sup>th</sup> of January 2023).
+                The winner will be determined according to the elapsed time to complete all 23 questions.
+                Please, use desktop browsers like Mozilla Firefox, Edge, etc.
+                To start the quest, fill in the form below and press the «Start» button. Good luck! 🤞
+                </p>
+
+           <div class="bs-callout bs-callout-info">
+                <h4>Code of Honor</h4>
+                <p>Participants are requested to respect the following rules:
+                <ul>
+                    <li>I will use only one account (one attempt) for {{ conf.site_title }}.</li>
+                    <li>I will not share answers or solutions of this quest with another person during quest running.</li>
+                    <li>I will use my real name and valid e-mail.</li>
+                    <li>I will respect other participants.</li>
+                </ul>
+           </div>
+           <form class="form form-horizontal" method="post" role="form">
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form_name.hidden_tag() }}
+                        {{ wtf.form_errors(form_name, hiddens="only") }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"><p class="lead">{{ form_name.name.label(class="text-muted") }}</p></div>
+                    <div class="col-md-4"><p class="lead">{{ form_name.name(class="form-control", placeholder="Enter your real name, e.g. Ivan PETROV") }}</p></div>
+                    <div class="col-md-1"><p class="lead">{{ form_name.email.label(class="text-muted") }}</p></div>
+                    <div class="col-md-4"><p class="lead">{{ form_name.email(class="form-control", placeholder="Enter your valid email address") }}</p></div>
+                    <div class="col-md-2">{{ form_name.submit(class="btn btn-success")}}</div>
+                </div>
+            </form>
+       </div>
+   </div>
+    <br />
+    <br />
+    <div class="row">
+       <div class="col-md-12">
+            <div align="center"><img src="{{ url_for('static', filename='img/DanoneIT_light.png') }}" /></div>
+       </div>
+   </div>
+    <div align="center"><p class="text-muted small">{{ conf.version }}</p></div>
+
+{% else %}
+
+<!-- Progress -->
+{% if conf.show_progress and (not isCompleted)%}
+<div align="center">
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="{{ stage }}" aria-valuemin="1" 
+        aria-valuemax="{{ conf.last_stage }}" style="min-width:7em; width: {{ stage/conf.last_stage*100 }}%;">
+        Stage {{ stage }} of {{ conf.last_stage }}<br />
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Pagination (Stages) -->
+{% if conf.show_pagination or isCompleted %}
+<div align="center">
+    <nav>
+        <ul class="pagination pagination-sm">
+        {% for s in range(1,conf.last_stage+1) %}
+            {% if s == stage %}
+                <li class="page-item active"><a class="page-link" style="font-family: Consolas, Courier New;" href="{{ url_for('main.index', stage=s) }}" tabindex="-1">{{ s }}</a></li>
+            {% elif (s < stage or s <= max_stage) or conf.god_mode %}
+                <li class="page-item"><a class="page-link" style="font-family: Consolas, Courier New;" href="{{ url_for('main.index', stage=s) }}" tabindex="-1">{{ s }}</a></li>
+            {% elif s >= stage %}
+                <li class="page-item disabled"><a class="page-link" style="font-family: Consolas, Courier New;" href="#" tabindex="-1">{{ s }}</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </nav>
+    {% if stage < max_stage and (not isCompleted) %}
+        <p class="text-danger">You have already answered on this question! Please, visit your latest unanswered <strong><a href="{{ url_for('main.index') }}">Question #{{ max_stage }}</a></strong>.</p>
+    {% endif %}
+</div>
+{% endif %}
+<div class="page-header">
+       <div class="row">
+           <div class="col-md-4">
+                <p class="small">Greetings, {{ name }}!<br />Email: {{ email }}
+                    {% if not isCompleted %}<br /><span class="text-muted">Elapsed: {{ elapsed }}</span>{% endif %}</p>
+            </div>
+           <div class="col-md-4 text-center">
+                <a href="{{ url_for('main.index') }}">
+                    <img src="{{ url_for('static', filename='img/title2023-small.png') }}" title="{{ conf.site_title}}" alt="{{ conf.site_title}}" />
+                </a>
+            </div>
+           <div class="col-md-4 text-right"><p class="small"><span class="text-muted">{{ conf.site_title}}<br />{{ conf.version }}</span><br />
+            <a href="{{ conf.url_bugreport }}" target="_blank">Send bug report</a><br />
+            {% if conf.god_mode %}<span class="text-danger">God mode enabled</span><br /><a href="{{ url_for('main.hiscore') }}">Hall of Fame</a>{% endif %}
+        </p></div>
+       </div>
+</div>
+
+
+{% if isCompleted %}
+<div align="center">
+    <div class="bs-callout bs-callout-completed">
+        <h2 class="text-success">Congratulations! You've <a href="{{ url_for('main.finish') }}">completed</a> this quest!</h1>
+            <p class="lead">Now you can send <a target="_blank" href="{{ conf.url_feedback }}">feedback</a> on this quest or
+                check <a href="{{ url_for('main.hiscore') }}">Hall of Fame</a> of {{ conf.site_title }}.</p>
+     </div>
+</div>
+{% endif %}
+
+<div>
+    {% if stage == 1 %}
+        <h1>Question 1. <strong>Guess the pin code</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>This is a <a href="https://en.wikipedia.org/wiki/Thermographic_camera" target="_blank">thermal camera</a> shot.</p>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center"><img src="{{ url_for('static', filename='img/pinpad_heatmap.jpg') }}" /></div>
+        <br />
+
+    {% elif stage == 2 %}
+        <h1>Question 2. <strong>The Maze Runner</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Try to use a pen or MS Paint</p>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center"><img src="{{ url_for('static', filename='img/labirint.png') }}" /></div>
+        <br />
+
+    {% elif stage== 3 %}
+        <h1>Question 3. <strong>Not google!</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Try Google?</p>
+                <p><a href="#spoiler-2" data-toggle="collapse" class="btn btn-default btn-xs">Show hint #2</a>
+                    <div class="collapse" id="spoiler-2">
+                        <img src="{{ url_for('static', filename='img/edward-kasner.jpg') }}" />
+                    </div>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center">
+            <img src="{{ url_for('static', filename='img/not-google.png') }}" />
+        </div>
+        <br />
+
+    {% elif stage == 4 %}
+        <h1>Question 4. <strong>Say 'cheese'!</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>QR</p>
+            </div>
+        </div>
+        <br />
+        <div align="center">
+            <canvas id="canvas"></canvas>
+        </div>
+
+    {% elif stage == 5 %}
+        <h1>Question 5. <strong>Book</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Use math or MS Excel</p>
+            </div>
+        </div>
+        <br /><br />
+        <p class="lead">There are N pages in the book, numbered as usual from 1 to N.
+            If you add up the number of digits contained in each page number, it will be 1095. How many pages are there in the book?</p>
+        <div align="center"><img src="{{ url_for('static', filename='img/book_pages.jpg') }}" /></div>
+
+    {% elif stage == 6 %}
+        <h1>Question 6. <strong>Speech</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Unmute the sound (use headphones, speakers, etc.)</p>
+                <p><a href="#spoiler-2" data-toggle="collapse" class="btn btn-default btn-xs">Show hint #2</a>
+                    <div class="collapse" id="spoiler-2">
+                        <p>Reverse the MP3</p>
+                    </div>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center">
+            <a href="{{ url_for('static', filename='files/strange-sound-file.mp3') }}"><img src="{{ url_for('static', filename='img/waveform.png') }}" /></a>
+        </div>
+        <br /><br />
+
+
+    {% elif stage == 7 %}
+        <h1>Question 7. <strong>Turing tar-pit</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Esoteric programming language</p>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center"><img src="{{ url_for('static', filename='img/censored.jpg') }}" /></div><br />
+        <code class="lead">
+-[--->+<]>-.[---->+++++<]>-.---.--[--->+<]>-.[->+++<]>+
+.+++++++++++++.+++++.++++.[->+++<]>.+++++++++++++.[-->+
+++++<]>+++.-[--->++<]>-.++++++++++.+[---->+<]>+++.++.[-
+---->++<]>.+.---.---------.+++++.-------.---[->+++<]>+.
+-[--->+<]>-.++++++++++++.--.+++.----.-------.[--->+<]>-
+--.+++[->+++<]>.+[--->+<]>.</code>
+        <br /><br />
+
+    {% elif stage == 8 %}
+        <h1>Question 8. <strong>Citate</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Check HTML source code</p>
+            </div>
+        </div>
+        <br />
+        <div align="center"><img src="{{ url_for('static', filename='img/citate.jpg') }}" /></div>
+        <!-- =========================================== -->
+        <!-- =    HINT!!!                              = -->
+        <!-- =    /static/img/citate.jpg               = -->
+        <!-- =    /static/img/citate_key.jpg ← SECRET  = -->
+        <!-- =========================================== -->
+
+    {% elif stage == 9 %}
+        <h1>Question 9. <strong>Simple arithmetic</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>For example, 99 + 99 < 200</p>
+            </div>
+        </div>
+        <br /><br />
+        <p class="lead">You need to make simple math calculation. Replace letters by some digits. The answer is a combination ABCDE (replace each letter by proper digit).</p>
+        <div align="center"><img src="{{ url_for('static', filename='img/addition.png') }}" /></div>
+
+    {% elif stage == 10 %}
+        <h1>Question 10. <strong>GUIDs uprising</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>A GUID (a globally unique identifier) is a 16 byte, or a 128 bit integer that can be used across
+                    all computers and networks wherever a unique identifier is required. Such a number has a very
+                    low probability of being duplicated.</p>
+                <p>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th width="30%">Feature</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Number of digits</td>
+                                <td>Must have 32 hexadecimal digits.</td>
+                            </tr>
+                            <tr>
+                                <td>Dashes</td>
+                                <td>Must have four dash characters embedded at the locations 8-4-4-4-12.</td>
+                            </tr>
+                            <tr>
+                                <td>Braces</td>
+                                <td>It is optional to have the string start and end with {} braces.</td>
+                            </tr>
+                            <tr>
+                                <td>Length</td>
+                                <td>The string must have a total of either 36 or 38 characters, depending on whether braces are added.</td>
+                            </tr>
+                            <tr>
+                                <td>Casing</td>
+                                <td>The hexadecimal digits a-f (or A-F) can be either uppercase or lowercase, or mixed.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+        </div>
+        <br /><br />
+        <p class="lead">One of the <a target="_blank" href="https://en.wikipedia.org/wiki/Universally_unique_identifier">GUIDs</a> in the list below is incorrect. Could you please find this incorrect GUID?</p>
+        <div align="center">
+            <textarea readonly rows="20" cols="180">
+{435204f7-d202-42e3-b168-5dec77b3b0e7}
+{fb43a227-522d-4ad9-acf2-6ba74609a6fd}
+{53aa7a21-8caa-446c-9ebe-b5848e49df5a}
+{177ab919-3acb-4e41-b16c-ef73bb627e44}
+{41ee6cd5-f633-4214-9f08-602727f9bcfe}
+{d3ed8c28-7d30-4c4b-ac28-dc9a6cc1c6b2}
+{d753bc9e-c810-4a00-a62e-68a00100e956}
+{a6a41bd9-a27f-48dc-ac05-ac583bd82c1f}
+{534d0b97-ae1d-4c25-8255-d1ee947f03b2}
+{7e1e6329-a17a-4115-bd90-fd167cf53f57}
+df4cfd7a-6bb4-41b4-b0d2-85dc5ad33049
+{d9078f9b-855d-44bd-a0b7-14ce1c950bc3}
+{44cbbcb7-cdbe-45f4-9a5a-331302eeefbb}
+{9b29f003-1f18-4ca1-b0a5-d877027c0900}
+{74a5d949-7445-4378-adc3-e06c97ed3b7d}
+{53e74b00-c044-4437-90f5-4d2e63873e6b}
+{f273761a-126f-4f15-bf35-006d261e640c}
+{15689b29-8abc-4fd2-86ca-8c0d4f7b832f}
+{c01765b3-777a-4f7b-b2c1-0f338df047c0}
+{133ead2c-4305-4038-97c5-ef7c90e713d8}
+{95ce81aa-d087-4deb-aac1-2bfb76dc04b0}
+{23a984c0-1f82-4675-b9db-654074d7220a}
+{b2018665-616e-44bb-a554-6ba51fb16a7b}
+{0ed29f50-55cb-4cdb-a13f-2ba28aa39466}
+{b33b5aff-15d8-4d91-92bf-9f5413b1d79f}
+{56f4494f-be01-4324-b668-92a0c339796f}
+{9a60a886-ece5-4497-8421-c7886af64cc4}
+{3a467577-8048-4019-b9b4-654206b9fabc}
+{629aafdc-c87f-408b-8df2-274607f62852}
+{c9588c6c-2245-4761-9bb3-12e9419cada3}
+{b815be99-5373-47c6-bc38-95fee648e14b}
+{e7c0d83c-9daa-4ccc-a103-62a48a15f41d}
+{5c58fc98-1f29-424f-836a-713a299100ac}
+{90063c1f-449d-4363-bdba-dcbbc7354d12}
+{b5ef4c13-6bfc-4c72-80c9-7653b407d8e1}
+{59220521-cdbc-48f0-9f05-0edc4715154e}
+{f332e908-90f5-4c85-a0d3-ddc3956cf2f1}
+{2122acc5-b229-4266-82fe-f18369b2b1c5}
+{aaa57581-3954-42ae-b51e-d0719fcd1ce5}
+{d5a460c6-3301-4ba4-bc65-15b98d44e207}
+{d832227e-9e75-4606-820b-bdfac450d857}
+{5bb199bb-0915-4a94-a020-a33183821ddf}
+{09759753-f6c1-42d4-8181-0ab690684a4b}
+{d751dc8e-e58a-4850-b02c-f05b9054fdd3}
+{90528119-4f08-4641-8073-2ba6c6b215c6}
+{48e36eee-18cb-4097-8e9a-5c6519feba75}
+{57b3494d-88a1-404e-a1f5-09704cf8f4f1}
+{709e64cd-2268-4a1b-bb47-81d18bc32eaf}
+{19e3c7aa-7cb4-4564-8d7b-606bfe491955}
+{39fe108c-3c2d-4b78-97b4-34002c29e81e}
+{70c25387-c98d-437e-9c62-c19f86e8252c}
+{e806079e-a131-4325-afe6-e8fa676027a5}
+{59633a33-b435-41e1-a764-91a87dee218d}
+{dbee5f7b-9184-479d-babb-952562377ffb}
+{adc19a5c-6e84-4030-9922-df1f4e10443d}
+{d218d85d-da76-47f1-aa2c-e50c787970ae}
+{bb73fdf6-adaf-4812-ab50-f3b71440ece4}
+{821d24a8-ce1d-436b-9a2c-12d69a86afac}
+{cea6010b-ff15-4932-bb5f-1be674645224}
+{e82cdb40-9c52-4ce2-9f7b-7fbfaa8ee8be}
+{34a9440b-5821-4f5f-872a-f63a5ab449da}
+{c1136e08-e90e-492e-8d16-8bbf10bf22e1}
+{bca4ee33-7673-4651-9024-b3f0332cf98b}
+{59acb946-261f-4941-a328-e1f1b235cd0f}
+{90aa639c-39c9-4fdb-a6f6-0eecab2c5437}
+{fe3c1cec-71ca-42fa-9e1a-007119672045}
+{5d7088e0-afe8-413b-a066-deb220f4e9e2}
+{276372aa-0518-42dc-8d8d-ba7074adb5b9}
+{78a8f06c-5576-4487-b4ec-5a9caedef333}
+{e8b05992-f6b7-4b75-a9f5-ef399ce7467e}
+{aa261c7b-9cf6-47e7-9993-86e4e108f76c}
+{83234922-f189-4631-a42f-b05512045a68}
+{c3634260-b17d-4304-b6c5-cfd853c5514f}
+{d69832b3-7882-4ff0-bfc0-79f884c2147d}
+{47946237-1d3b-4d90-a718-dabbaadbc7d3}
+{4f6f598b-deb6-4f8d-8b3e-5a494e906929}
+{be68d582-ff8b-465a-b037-1ca2d6be0005}
+{a9305964-70bf-4863-aeae-82d13e892d1f}
+{d99c5649-f5c4-4857-aa9a-60c2349f0f02}
+{852f2bcb-0a4f-4e6b-b359-38ee7ee23afe}
+{229c8eb5-362f-42be-a710-74c81027105e}
+{68d8d236-e195-4171-8d77-6ac024eb1b31}
+{489e0618-cc5f-40a1-a841-125ad6298be9}
+{c6fa722a-5a2c-45d4-9659-d3c32b4f8437}
+{c3569c2f-89e1-46b2-a628-dcf8558ec7e7}
+{6aa1cb52-0615-44d2-9f67-51ac702e8d38}
+{5305f4fe-3e5f-4e1b-acb5-0b94509dd407}
+{1e7545a0-ed91-463e-86a6-154538aad0b3}
+{e40c90f7-66a2-43e6-8602-093abb5ab150}
+{77e78426-4aae-41f6-a56c-ad880067a363}
+{5eaa7add-9b8d-4aaf-9abb-5d042a67c77f}
+{cb9bff54-39ff-4111-bef2-cd693dcf3125}
+{0e26a4e1-6b1c-4760-8bef-e50994bb6c4c}
+{4f1a09e7-e0e6-48a2-87f1-1b3cde28e96a}
+{3460f45b-f26a-4f8f-8890-26bbee4230bf}
+{f6aa9593-3f0f-491e-851a-253001b5d354}
+{046ff410-74ad-4637-8d71-9b50344da08e}
+{9615ad7f-28ec-4285-96b0-be6b6546fe65}
+{54d71425-abc2-4d8c-8e2d-03fc375ec3d5}
+{f5311dfe-cbf4-439a-b76d-0ae5b3efb84a}
+{1c630481-3c4a-4e3c-828d-ff7c048e0789}
+{bbb20a2d-d8fe-435b-a104-77ec9a01c4d7}
+{2012b5cc-f075-4e64-bbba-af547326b0c5}
+{2a1e73d8-7c4d-425c-a89d-de212dce7680}
+{2edad387-8fdb-45be-9456-e8fd6ce19c26}
+{7f2981d5-9626-4ac5-b657-c727c7c7b04a}
+{9ab90209-1daa-464c-87ed-78c2a95d06af}
+{35809ed3-e8c3-4a1e-a6b3-e030a306bf10}
+{eb221e93-98bb-46c7-911b-0ef9f745dc3b}
+{4b9dc569-549f-4367-b957-cdbef8b2d29c}
+{505fae30-2e9d-47e6-b66f-573cc591eea0}
+{b9f99238-e02d-4ada-ac2c-91162632ac89}
+{298c52a7-aaca-4d7b-ac15-945a25ee05d0}
+{9f47c89e-3ae5-40c2-96ee-dcbe2ce34ecd}
+{df57a43f-5319-4fbb-9533-994ac390e956}
+{3dfdc307-89dd-40aa-a16e-f662f88cd7c4}
+{8f29394d-44a1-4017-b962-50750b68883e}
+{19a07912-97e5-4823-b3db-8ae995ea65c0}
+{dd32b350-0801-427f-a9a4-563b7f2af76d}
+{45d9e525-e96c-4ae6-b6ac-fc9a1621275e}
+{d2e8c7ef-ec17-425d-afa1-20866b675960}
+{20259668-4672-4598-81de-56f34093d7a5}
+{8ee5276b-b495-47ab-8661-fe22546b3116}
+{1fb9b220-f88d-4c40-88d1-102ce72eb39e}
+{309d18ef-a444-4998-986a-297f32a9d3b1}
+{55089625-e23d-41d4-a4b6-9f0d5433f680}
+{d79ffae6-5441-4a9b-bf0e-8033464dfd2e}
+{7cd7871e-882a-4212-9c30-c25fa4051f5c}
+{fa0c352f-56a5-439e-b514-54d67f119b77}
+{313ad0c5-7b52-4673-adb9-5e28e24482f6}
+{bc921633-04b8-4230-9358-bd6287cf1dee}
+{bb40c2c2-7a67-4a59-aad2-2dad28d8688d}
+{6e3e67f8-043a-4dad-8351-a365ed8b0557}
+{7e060010-4599-46d3-819b-5d640acd2869}
+{ac7dd511-884b-463b-8dbe-44b0e33c2ac4}
+{f7463e6b-accf-4a8b-b419-895ffa9c9d3e}
+{bdde98ef-32de-49a3-b27c-f391666e157e}
+{97ada22b-13ad-4e6a-9f88-36ee39296234}
+{55eadc80-b918-47ab-aab6-c138f40c656e}
+{bd2ef205-4d87-4808-9481-3a631d9b7991}
+{67981602-65da-46c3-a2dc-769a0f3ab506}
+{06522ab1-7fca-4061-8c6c-37a460c9bf1b}
+{f72ef265-9dc3-4ff4-8422-dd913f8ff4fc}
+{add14d5d-58a0-4428-8154-a22db67c38dc}
+{27258a67-aa67-4135-b599-386595853ca2}
+{10db050e-8334-4b30-84e0-c2fa2e7d5f06}
+{719bb656-def8-4ae0-bc5a-b908cd4f616a}
+{90dafb3a-f8fb-4f18-8ac0-8fe52cc57517}
+{fca80e9b-f851-4b8b-819a-a763c9409ac1}
+{a2d4a90f-b60d-4fb7-a49b-cc94d73edbee}
+{0be7a43c-88b7-4acd-a980-68af538f37d8}
+{57cb69aa-070f-404c-a734-a0572a4453dd}
+{ce185125-8e1f-4bea-9d0b-95bb76632e20}
+{de568753-cdbf-499b-ae68-4af3847240c0}
+{5e5b25c1-c2ba-42f8-8810-a9fb6105112a}
+{d4b94312-4c66-4408-acac-2045ad42a5ea}
+{99fdf007-348e-48fe-97a5-fa310dc01bbf}
+{8e4a0a33-c078-4fab-958f-5ae8a57487c6}
+{ef5891d8-3da6-4fd9-9135-c230a5cb6b8c}
+{0622b55b-fbdb-4ec1-afb7-334c02612842}
+{054a73d9-fe48-4d73-85c5-5be52d204bf9}
+{cac7e90e-b3aa-478e-8ee1-cbe104eab10d}
+{1f523603-4391-4f5f-b1c4-5207bbe5b992}
+{9574d503-c4a1-4e91-80b4-cb7167415bf7}
+{b3ae52ef-42b8-4538-ac4b-f261e3c5278a}
+{34c884bd-ee3b-4ffd-9ff1-9310c0d3379d}
+{ff542224-12a7-48c2-a8c1-e89de769870f}
+{817c9af7-7454-40a0-80c7-adbfb50eef7a}
+{88f82773-1b3d-4c17-b41a-118829d48cf9}
+{5fd7a536-99f8-403d-8fd9-8813fba97060}
+{61edb106-2777-40bb-a0d3-51dd8b2c615d}
+{5d85e576-9b0d-4cd8-be9a-b0c12d28634e}
+{09ee770d-ef85-47c4-8475-68fd0e9c5eaa}
+{b24a9384-e787-43eb-8c52-8b311eaab8a2}
+{6d0663e6-9408-417c-9d1a-52c82830d8b8}
+{f0d5380e-ffd1-436b-a1d1-d87c1d3d1e70}
+{da824d47-744c-4151-8e5c-267da1d33f16}
+{9bbc30b5-12f5-41b2-b002-0255f4fb9314}
+{31c3b127-5ff4-43a7-8be6-dbf75107745c}
+{3856521f-de57-4ce5-9073-ae4617a6b982}
+{17dc1d4c-fc5b-4d91-a5e4-52cf97ca2e80}
+{d5ed3336-3a62-4be4-8820-75f2780ac199}
+{b950c780-693d-44f5-9972-faaa07597ebd}
+{a738565d-b955-483f-9b99-7c0701fc45bd}
+{62a13e3d-6ed0-4585-b08d-8d687fe1c55b}
+{916abe3f-a548-4cb3-a9c1-f3ab9d5bb11a}
+{3f3b419e-1bae-41be-a900-79835ec1b6f2}
+{a7e2e88a-f2da-4cd4-8c53-90f01394d194}
+{5f3467f4-d2d0-4b21-a640-4fbcfdef1516}
+{b03ab0e8-eeeb-40ff-9daf-4c7c51469c2b}
+{791f4611-9292-405a-9ac7-39afd9426a68}
+{ec3fba39-906b-449b-a6c9-078a9300fa38}
+{33e57c1e-2bab-41e5-aa2f-3c303a0240fa}
+{fc595482-259b-4f5e-8492-60f81fba2d54}
+{ac2f02c6-d6c1-4904-ab6d-4de3b7a6ef81}
+{12b25dd2-b8dc-4572-b09f-44fc389c9ffe}
+{76371700-0f6e-4e3f-b749-94fa47c3a244}
+{37870617-e5b2-492f-94a6-c36fdd9f49fe}
+{d817255f-c98a-43f4-856e-b2a0c431362c}
+{0ac99e82-da89-4ce2-a553-a7a2bbec486e}
+{4a4c408e-08f7-4e17-9ded-90396a4470a8}
+{dad4dd10-b05e-4805-9fcf-e74b066d93d2}
+{8812da32-451f-42ce-8103-f508f8c67bde}
+{05c85ddd-9c81-4990-95cd-793e92dc8029}
+{668c9cea-e408-44d5-aea6-ab6bb42da014}
+{4e10592f-f382-4a01-8e7a-6ea2d6136fa2}
+{4ed4167d-572e-42cc-8c38-9b30d37a94ca}
+{bd7b2424-4b02-486a-b2cf-5c65e43b4329}
+{95d2c451-e1a8-4069-806e-196a5688fd11}
+{e051daa8-ce36-448d-b47a-683fe7732add}
+{1a183642-5c0c-4658-99c1-bf8e0debe449}
+{f90ee5a1-4bd3-4531-8e10-04e8087843c8}
+{0fd7b53b-1f60-496e-84cb-88948495865b}
+{a7b4e666-92a3-4a28-8d58-a45bac82d7b5}
+{940c5db4-abfd-4bbf-b20e-cc9e651f835b}
+{4a264598-0459-4b2f-b7fd-d2917fa69923}
+{9d9f7251-6654-4857-b929-23a335d07fd6}
+{6102dcf7-6ab2-49c3-a804-6c52b70278c8}
+{61fc76e6-5163-4b1e-9a0e-67cec91f2d41}
+{8b6d44de-2a68-4e04-84fe-17b00b21dcc9}
+{a2d3be3d-1c3f-46e4-a3fe-0851a9fe70b6}
+{aa3599d4-e642-46ef-b958-a535e83041ae}
+{2d1a6ebd-b030-4334-b4a2-36be6ddbbc86}
+{bfa4fbc7-a39d-4abf-9f49-a48a5386c215}
+{d0602b5c-2d95-4838-b3a9-b083d586ec87}
+{09e86cf3-081b-4f20-8ca8-bea32687bfd6}
+{2e24044a-d14f-412e-b984-c2058a7ef89e}
+{7b938c28-87e4-46f6-a728-e67a93aaf2c1}
+{374f21b9-e744-48e1-9bb5-fef63df92c71}
+{3179879d-d87a-4360-ac88-e0efd33ffd2e}
+{2cff2ca2-3cc6-4785-9dcf-19e66521753e}
+{16337a80-a9c6-42d9-86c4-a784d6bd160d}
+{a1727c2c-6636-457d-add6-eeff51e4463d}
+{cafcd529-a67b-4831-ac1e-9321a3cb31e8}
+{8612c3ac-78de-49cf-8e0c-55c4c558be2a}
+{4bac7785-37fc-4903-8a38-20862ecbb8da}
+{fe622a79-0707-4762-8f0d-03f8889625a0}
+{94424ba4-1d21-4bc9-8fdb-6e0495567479}
+{e9d66fe5-8083-48b7-b51c-9eedfb2c5e0a}
+{90f958bd-a50c-49ea-812d-dcbc755fd4db}
+{14900c81-7282-4d9b-82a5-cb09f66ed40f}
+{58fcc6c4-12ea-4193-8c92-e1da8a4ecd91}
+{713f48c4-a3e1-46c1-bdfb-2f60a92686eb}
+{3d3076ed-fee1-4c07-b4f4-a61efbea2848}
+{f9ac0a61-e21d-4b23-9034-00ab55517b98}
+{daa5f53b-b5ef-48d2-80ea-e41ad4f4fccb}
+{bc2dc0c1-d34a-4f3d-aa8a-327897367a49}
+{5fe8e7fb-f95a-4274-8c0b-f9d6f52cb51e}
+{90eba80b-49f4-4411-8f32-1aa2821736b4}
+{44eaec34-7929-4b3d-b511-4350b8d7481f}
+{0a750f97-7c8b-4846-8643-5826ad5db5ed}
+{d34d4148-cabb-4db7-b3f2-747bee3cc696}
+{3b6a22c3-2162-42f2-89e2-33ea0317992d}
+{b7fc5295-df91-4665-9c10-7373fece2cd3}
+{f6ab53ec-bb7b-48a4-b39b-019f31930dc7}
+{7a115c92-56a4-433c-a3c2-8d5cf87e0771}
+{34e2df4e-8446-4067-97f9-40403829078f}
+{74c9e2c0-46c7-472f-98ec-c28a36873a4c}
+{3ff8fdc9-5192-4a5c-a97c-d42393fcbeac}
+{c4505da7-e375-44dd-8785-f11f389eab83}
+{2ccdadb3-5123-406d-9e2c-b3aa64608b5a}
+{6c15145e-a0c9-41cf-be1a-2cadf87a3c10}
+{180e2130-9db9-452c-a897-8141ec781e70}
+{bc882abc-696f-42e8-825e-a2bb6ed3ff19}
+{20c5e681-5ce8-4b59-af88-03f79e92bb8f}
+{91054933-686c-47c4-8607-aa4b5d826bde}
+{1821d98f-acd2-49c1-ba38-5801a8453bea}
+{e838f289-059d-4b84-93e3-54b83ad3fbee}
+{12b7d02f-34a6-4288-80f2-f97fa3032799}
+{fe3e18dc-6d65-4bdc-9c25-8bb9aaa53912}
+{4257b4d9-d84b-4202-9d15-e29e75891649}
+{18ef332d-cd27-40da-8a6c-bba49cb68cda}
+{056a4403-68a6-4025-9a2a-7701f7e90fd8}
+{011c8fff-1233-4628-8a90-b824863769da}
+{da5c9cdd-6f0d-4ce4-8a6f-e46964ddeeae}
+{5bf9a589-3b49-44f9-b848-fab0e1ce8f01}
+{388cf306-6c17-496e-97ca-0d9b053f1f95}
+{f641a084-4c97-4c59-98a6-ecab4dba88ed}
+{c6412daa-cbc8-491e-840c-1bf6214ea22f}
+{d76f6587-afb8-47a2-a39e-2092b451389b}
+{0f75e93f-7c05-426d-8046-bb9a29444445}
+{da57fdf8-74e9-4f43-920b-050e0707f7f1}
+{c864a355-fcb9-485e-9b6b-19c73d6fc36b}
+{d72043b2-780b-4ed8-9965-a694ba15bd36}
+{b03124bf-2078-4378-b7eb-811511742046}
+{fc2e8367-a0e9-46e6-bc5d-6ce2a7a2eae3}
+{fa43d860-945f-4d32-8c60-e004b33bfff7}
+{a2e9e49d-9cee-420c-b830-2900b39ca417}
+{6d3aa9c0-4f77-4298-b47f-d47ebc0e69df}
+{4cb755ef-051b-4617-8ef3-597617b3d0ae}
+{4bc8288f-bae1-4841-b706-e5a99ffcb043}
+{0e54824e-c812-4b89-96f3-0c4a9e9e0abe}
+{6a63fcbc-b3c4-4046-bcfa-fc8d4a577b8a}
+{a5cabe35-2f99-4f88-9cb6-7d76bcd7e630}
+{059cf4a7-99ab-46c7-8f53-64b7c2ef5d81}
+{9ee427e0-3035-4a8c-aaea-df931dfd6505}
+{9fccacca-e103-44c2-ac2b-ec03d422164b}
+{61974a73-dffc-4328-a134-ea54098f8a6f}
+{4821abea-71cc-43cc-bb42-2dee2c1d8f4f}
+{6bef7d18-c7cc-41bb-8d17-1a11bcfe00dd}
+{4aadbbae-1afc-4b89-a449-bd369393a211}
+{fe00dea0-e45d-49f4-8829-5ca0ae179433}
+{9aefc80a-c1bc-49b7-9ede-96586a602811}
+{c091e482-13d4-4217-9b55-d16b3a15ca7c}
+{7191bd4e-916a-4a69-9400-f314012cb401}
+{a818daab-eb3f-4d93-bcbe-103931f9c42b}
+{b26bdadd-76f2-4f37-88d9-d01bf1f1dd90}
+{aa65ff6a-db48-4982-a207-c39e2e9ea27d}
+{83b5b6d0-2342-44aa-82d0-5b4cfc6e087f}
+{a7472c96-991c-4064-a393-64a52fb2cf3b}
+{b3ca33d2-e357-47ca-af3f-b29ed2e11f9b}
+{cbbeea0f-0f5d-4c38-86eb-d13771758c7b}
+{11bdfa33-95fa-4e91-b4ee-906e58b1d76e}
+{3a2c5e4a-c286-4ff0-8362-40bd6bc11f5f}
+{5393f008-cbc0-444a-bc82-71a875452c3d}
+{19e4c5f7-aac3-495e-8c0b-854f38bcabcf}
+{3e2dc355-269d-4325-a785-3ad2f1e345c6}
+{118b10ec-e484-459d-849c-6e818880c26b}
+{92d761a8-9c1a-46f2-8cb9-d640fb0b7d24}
+{6c27c3a0-6f20-4a0e-9efa-e633a36b4682}
+{3bcbe50b-0866-45c8-9721-ef5bc85e9e7f}
+{8d59c0ed-201b-4dda-be6e-49c6475937e2}
+{71b19d5b-6f3d-48d1-9233-ae4c57ec4f04}
+{0ac2e600-7779-45fb-be0d-31b1cb7c862e}
+{78a2680e-9388-42ad-a202-f86d7e4c01f7}
+{db00b347-6be4-4d7a-b166-047928961100}
+{7542bcfc-dff6-495f-9c65-c4e6f40ffaab}
+{f958c1f7-3597-4084-9a0f-6c3a6a78180e}
+{208599e1-c4ee-407a-af99-dc6933a37759}
+{0ac8a11e-dea6-4cd9-bd4e-96225dad9c68}
+{f0c5e17b-6c59-45e1-99b4-557e414b2422}
+{2f2133e2-294c-4b0c-a25e-04e74772fdf8}
+{f1ec421e-b0d0-4583-91c3-e7557f91b121}
+{996a0273-f6c1-4850-991d-e29dbcb720ce}
+{c1296c88-f815-4517-9079-03a39343decd}
+{bbb8db6b-50b1-4c49-8c32-6fe4cdea741c}
+{fd628891-1786-4e8e-b60a-becb4315104b}
+{1c2681a6-3a79-48cc-8072-7cc6bb6b03fd}
+{c3325985-863d-4ee4-86b6-238bc7a260c4}
+{1af25ca0-4868-4370-9cbc-62e9e783873f}
+{7faf94e4-8212-41f7-97a4-25f3a1a5d9d5}
+{014594c2-270c-4025-b45a-7e6cacd892c2}
+{0fd84515-fd38-4d29-9493-8b2004bd9d5e}
+{8ece39f4-a385-48ef-81a6-8c48c16df1c2}
+{06293c61-41bf-4a8e-98d4-3807ca31a4d2}
+{f9540ce7-84a1-4837-a042-127864f1adcc}
+{4185e1a7-0c00-45bb-9a8d-c1fc443b7d33}
+{a37dbfbf-a1fc-41a1-b95d-a1c0b4a42c21}
+{be81d666-920c-4769-89d1-89c88e2fee89}
+{683c4126-b4aa-42d4-a236-a2e407d3c65c}
+{06569706-2a7f-4a3d-87d4-d2698d22554b}
+{dec4a579-3476-4eb9-9255-2472d991fdad}
+{fbb3dae4-965d-41af-811c-de715a3127c8}
+{4f873e17-0cc5-422b-aeb0-209949621b14}
+{b5aaa4fa-d462-4ca6-8aaf-610e21af91cb}
+{acdc8ae4-606b-4b19-bf2d-f8387ceecb84}
+{9d48c439-e2fd-4bad-81a6-46030b4177ec}
+{f1131b67-7f3f-491c-9362-25e3f26654af}
+{cbe5062f-4eb6-4ade-936e-0f42cc954aad}
+{90b52507-ccfe-4347-a98b-5ee2efae9da4}
+{541a4c19-f60d-4ec9-97f5-a110c9d91106}
+{1a1898ab-e9b2-4ca3-96c3-6c18b6314322}
+{4395ec9e-e6a9-45b6-9c7a-da43760c3448}
+{ae12dfb7-4b34-4e36-8785-4e0c882bf70a}
+{ae83d1d8-1ac9-454a-a2a0-6cf289a7ab8f}
+{3b676fd5-bfb9-43db-9ccc-d0f3112ba89c}
+{a24f03da-006f-4053-88c0-5e2af0195ad3}
+{bd8cd588-7db9-4701-86be-f04919b9e7d7}
+{b5f61048-dcc8-4e48-a93f-2f8772a71c0a}
+{49a80a35-e56f-4d22-a434-8e61417213f8}
+{84bf6681-dfbb-4e1d-848d-cb762d503f74}
+{29d1c725-6ac9-4de2-85e2-fca4f238429f}
+{20bd917b-6e6d-48e9-bc03-f6225bb3c50c}
+{e216898c-c61f-4dc9-bb97-0ebb14b002b3}
+{cf84d864-5282-44d7-84e3-dadb476fcc4f}
+{3d2d56a6-42ec-41b5-8970-8a1379add551}
+{ffe6cbb8-00c4-4006-b024-84b5a526ec97}
+{0ee8457e-33e8-4dd8-bc48-1d8bd2fef6f8}
+{50778ec1-d770-48dc-9782-7cea98d8bbb7}
+{9b77ca47-f470-4857-a805-6d6bb01a8a8a}
+{2b201552-54cb-44d9-a9d1-6b0c57ef151c}
+{b03a94a3-a755-43d7-9e19-13cccfda5e24}
+{42f73d72-8438-4fa4-9db2-38351faa3494}
+{086544c9-0287-4e5b-8cae-037006b962fa}
+{cc0a65bb-77f6-444e-9948-3eab3eef50ad}
+{25905469-dba9-494f-b7e7-14bdf34135f4}
+{8fb8f715-13dc-40b3-9e02-37fd03ab7968}
+{bf989f3f-72f1-40df-a8f6-d23a3e0c1ca1}
+{b18ceb3b-3515-4235-9278-df615ff788cf}
+{5f36c9f6-4919-44cb-b3d8-25cdae361efc}
+{8c1c1977-ab13-41f9-a69b-48afb5872ee8}
+{2ce23473-7e2c-4a60-815f-99e97b436bef}
+{8021e1ae-04a6-4024-aec2-838e0bda119a}
+{5fbf514f-9cd9-4982-bc72-6e2e6544a5d2}
+{e26241f4-effb-4f5f-b7ae-161f7c04b73d}
+{7e776a41-729d-4083-b9e2-f63ac529d6b6}
+{bde5eb43-e8a4-4ae1-9ac5-699097c3fdd4}
+{cc48aabd-05c9-43e9-9926-be3a8ccbd92a}
+{fcf55d96-8184-4047-aa70-ace1821e1d41}
+{75dcca5d-0655-4076-b352-fe53ea19feee}
+{41a79c00-57b3-4a1c-8a89-d1ad052970b6}
+{fb7fd276-0d31-440d-8e64-5a6ee2f79d36}
+{e734115f-ed8d-4c2d-b5ff-9e007eda5e82}
+{552f3c50-a43b-493c-8fb1-06907f7a6249}
+{e73a1047-71d7-4f4f-b1c0-bf8ddb1c4444}
+{910cb13d-0904-4768-901a-cf56b8aac3b8}
+{1dd07dcd-54eb-46d8-b6da-1bbe4f0b6c7f}
+{166b86af-41ee-4b2d-9ab0-17eb079de115}
+{b9f5d74c-d77b-408d-b7b2-b01109193887}
+{1031d2b9-ae8c-41d4-abbd-1ae824c6c29e}
+{12c96160-f99e-40a2-a6f5-3598b202d005}
+{c6f0373b-dedd-4fba-b5e3-fbe4875f6368}
+{1f7bab3b-b954-4b02-8b8a-3fedf1dec31c}
+{da1c86e4-d962-4a02-bb52-e07f6649fbe2}
+{8c227a09-698e-4c1a-8153-56558af83bb8}
+{88438a58-e8dc-4808-80cf-b8ef41eada7a}
+{9a65c721-4216-45a0-9b11-cd294dab3643}
+{81cee2f5-9e9c-40d5-8a55-7b173f0d36c7}
+{785b64b8-5446-4686-9931-b71bfbf53729}
+{d0061997-ecea-45ec-8a28-072422537171}
+{b29144e7-dbe2-4f78-a0b9-6aa648c5bbe8}
+{16123fc9-dcbc-4a18-b84e-2b091af0f669}
+{8e7d1def-064b-48c1-b51e-60495703aefd}
+{f64d0119-f041-4b4e-8ec2-cfb0dfecef59}
+{35cd4d29-f221-4ea5-83e7-7514efa6a179}
+{5b140e07-e5b7-460b-a242-0442787e542d}
+{33518126-b71e-43cb-bbdc-4d722edf1f83}
+{0e1b898c-1dc3-46db-a760-ca6dafb877f5}
+{f931f3d6-b833-41b3-8bfc-d54524fa071b}
+{3139da7e-5e0e-47b4-baac-67946874f878}
+{181ef1b1-ab03-42ce-85c0-3d156dc5f083}
+{045d8eeb-cb9e-4d03-bde4-067b5ab2c172}
+{a1cc3726-1efc-4059-85fb-d5512fc08121}
+{80ced522-67f8-4949-9541-5699b7416a1c}
+{9fff47a4-ffa9-4f67-bc37-111a1b1b9e05}
+{daa807f1-16cb-4e62-bce5-242117c5b1bc}
+{7a226325-d147-4d35-ab7b-4c9f69097aee}
+{70548520-ad02-4722-80fa-a03e0d887996}
+{45f6b00a-6334-4423-ab37-a5e0c04b9adf}
+{969b319d-9967-46c4-9a1f-4419604d9b91}
+{71fbe9ec-9eb2-4534-ac84-c9fc14def965}
+{353d36b4-24c8-4c3e-a732-e0719b68ced9}
+{f7823c43-78c1-4a37-a846-561e9e35701c}
+{7fb2a1c6-dd30-4323-a248-1fa07c0604hc}
+{4ac40e05-a7f7-44a9-81b5-9edd8df5c78d}
+{5cace13b-bfe1-44d5-b9da-e85dbe3c2d61}
+{fcbeb0f7-f728-458f-a179-809f60a4ac8d}
+{4bccbb79-e2b4-408b-a71f-d75637184fc7}
+{7c018c34-f836-4bc0-af28-f1e2c8748c1f}
+{272813fd-203d-4965-80bf-00ccc29cc9ad}
+{c6ea37df-3bc6-4202-80b5-5b04dab70450}
+{657f2a7e-4270-4127-a43e-41a169094deb}
+{e9f63dfd-688a-46d3-9c93-a68ba09a9f20}
+{e2f005c3-ca22-4ac6-91c2-890e42761860}
+{be96d35b-d82b-4627-8b55-d6b143070561}
+{f4e06c76-515f-4430-acd3-4978439a484e}
+{f045000c-2d6a-4b57-9762-44461a12419a}
+{181418c9-60aa-4c7f-a862-2e6d868000a4}
+{6956faf9-70dc-4ab1-8a47-bfb6d0a72bc3}
+{c5d1f093-466c-4c2a-9458-6513f4664460}
+{6b83bcb2-cae7-49d5-9b24-80e73d0a6ecc}
+{10df3007-7b7e-4d92-a052-24a74f73eb46}
+{184537a1-57f3-44d4-bf3e-2521e999976b}
+{bd0e1713-ac16-4870-b1c0-57b41005d4e4}
+{57ad8ce1-f3c4-4acb-98c3-9e6d0e94ee37}
+{901a9855-b7e1-43bc-ae3f-74eb8807323e}
+{c65e4be7-16d5-49ac-8071-c3889bea3207}
+{8482e874-10cf-4140-8756-f8743967b2a9}
+{7542cda3-39ef-4eec-8b02-13b3501a1293}
+{06b5dcbc-0d0c-4569-8f4c-307046d1aaa1}
+{4fcd4ec1-d4b5-4aa7-bc18-af327fbe55af}
+{f21ab931-8133-412e-84af-913a41b1147a}
+{87f3a8ac-4ac9-4251-ad8b-44cb6cc71ee5}
+{197337e3-f41f-4cb9-ac5b-3005614c199d}
+{a25a760c-412b-4301-9fa5-17219c5fd8b7}
+{1b11b81f-945e-4214-bf97-1051ee8155e6}
+{36ce736c-702b-457d-96ff-fe563356048b}
+{727f52c3-eb17-4810-9657-89322b2306e0}
+{9287b3f8-b345-47f6-a1f7-08fc45e8dd9a}
+{68c0730f-ebf8-4897-8ba6-b03ef69066fc}
+{4d6a7e0a-51a7-4d51-a5b7-c3534a0ab0f1}
+{ee91a8c4-69b5-47aa-9cad-a552eca8e8a4}
+{5fba43d3-2bb0-4e2a-8677-43f94215c393}
+{72ff2fe5-a738-4225-9381-335af80ebeca}
+{c1201f3c-a6cb-40c4-840f-073f018f6ead}
+{1fd61fc1-7078-4d13-81bf-10cb8a918b50}
+{88d4350b-2fe4-4a7b-8e49-1be3b6557ab2}
+{7a40366a-82dc-4356-92f5-c768a72afbf7}
+{e968a2b1-1e62-49a3-b5ab-93a75c1b10d0}
+{41890823-1dd3-4e32-b009-8ccfdde1741b}
+{bff682c3-6216-4590-bf6e-c2efd5e3cbc5}
+{4c00ce2e-4f8b-47c9-859b-c802cedfdc7a}
+{773826d6-a20b-4520-8192-811c39c60682}
+{02274d54-1618-4299-b497-7b0778c9d8cc}
+{14d76a85-e899-4055-beb9-ae357a65c256}
+{0fe4c414-170e-48e1-b213-704c94d0f924}
+{f5168f7e-6424-4a5f-ab44-9812495e99bb}
+{2db0f427-e7c3-4d81-b994-54977a90b408}
+{8b196b51-3008-4c60-95ed-5ebb72152de3}
+{464a3640-9fbd-4cb6-91d4-31354f88de1d}
+            </textarea>
+        </div>
+
+        <br />
+
+    {% elif stage == 11 %}
+        <h1>Question 11. <strong>DANONE.COM</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Whois?</p>
+            </div>
+        </div>
+        <br /><br />
+        <p class="lead">When was the domain name <a href="https://www.danone.com/">https://danone.com</a> registered?
+            Please, use <code>DD.MM.YYYY</code> format for the answer.</p>
+        <div align="center"><img src="{{ url_for('static', filename='img/domain_icon.png') }}" /></div>
+        <br />
+
+    {% elif stage == 12 %}
+        <h1>Question 12. <strong>Gold mining</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Some chars are rare...</p>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center"><img src="{{ url_for('static', filename='img/nuggets.jpg') }}" />
+            <p><a target="_blank" href="{{ url_for('static', filename='files/find_rare_characters_in_this_mess.txt') }}">Download</a></p>
+        </div>
+        <br />
+
+    {% elif stage == 13 %}
+        <h1>Question 13. <strong>Your old Siemens S45i</strong> </h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>MCC, MNC, LAC, CID? Well, what does all this mean? Maybe you should ask Google?</p>
+            </div>
+        </div>
+        <br /><br />
+        <p class="lead">You accidentally fell from the aeroplane, but were able to land safely using a parachute.
+            You need to understand where you are. You don't have GPS, but you turned on the engineering mode
+            in your old phone and saw the following information:
+           <code>MCC:440, MNC:50, LAC:49223, CID:53901314</code>.
+           What is the name of the nearest city/town/settlement?
+            </p>
+        <div align="center"><img src="{{ url_for('static', filename='img/siemens_s45i.jpg') }}" /></div>
+        <br />
+
+    {% elif stage == 14 %}
+        <h1>Question 14. <strong>Sequence</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>10 — ten, 9 — nine,…</p>
+                <p><a href="#spoiler-2" data-toggle="collapse" class="btn btn-default btn-xs">Show hint #2</a>
+                <div class="collapse" id="spoiler-2">
+                    <p>10 — ten [3], 9 — nine [4], 60 — sixty [5],… </p>
+                </div>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center">
+            <img src="{{ url_for('static', filename='img/math.jpg') }}" /><br />
+            <p class="h1 text-primary">10 → 9 → 60 → 90 → 70 → 66 → ?</p>
+        </div>
+        <br />
+
+        {% elif stage == 15 %}
+        <h1>Question 15. <strong>Sherlock Holmes</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>diff</p>
+                <p><a href="#spoiler-2" data-toggle="collapse" class="btn btn-default btn-xs">Show hint #2</a>
+                    <div class="collapse" id="spoiler-2">
+                            <p>
+                                <a target="_blank" href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/fc">fc</a>,
+                                <a target="_blank" href="https://github.com/dandavison/delta">delta</a>,
+                                online services</p>
+                    </div>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center"><img src="{{ url_for('static', filename='img/sherlock-holmes.jpg') }}" />
+            <br /><p class="small">The Adventures of Sherlock Holmes [ <a href="{{ url_for('static', filename='files/The Adventures of Sherlock Holmes_v1.txt') }}">v1</a> | 
+            <a href="{{ url_for('static', filename='files/The Adventures of Sherlock Holmes_v2.txt') }}">v2</a> ]</p>
+        </div>
+        <br />
+
+    {% elif stage == 16 %}
+        <h1>Question 16. <strong>Geometry</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>The triangle is right-angled.</p>
+                <p><a href="#spoiler-2" data-toggle="collapse" class="btn btn-default btn-xs">Show hint #2</a>
+                    <div class="collapse" id="spoiler-2">
+                        <p>You can use either strict math methods, or just measure triangle sides by a ruler (approximately)</p>
+                    </div>
+            </div>
+        </div>
+        <br /><br />
+        <p class="lead">Each square has an area equal to 4. What’s the area of the pink right-angled triangle?</p>
+        <div align="center">
+            <img src="{{ url_for('static', filename='img/geo.jpg') }}" />
+        </div>
+        <br />
+
+    {% elif stage == 17 %}
+        <h1>Question 17. <strong>2 + 2 ≠ 4</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Unicode</p>
+                <p><a href="#spoiler-2" data-toggle="collapse" class="btn btn-default btn-xs">Show hint #2</a>
+                    <div class="collapse" id="spoiler-2">
+                        <p>1 = 49</p>
+                    </div>
+            </div>
+        </div>
+        <br />
+        <div align="center"><img src="{{ url_for('static', filename='img/utf-8.png') }}" />
+            <p class="h1">
+                <!-- Unicode-->
+                <code>
+                    <strong>&#9823; + &#49; = 9872<br />
+                    &#9822; + &#9775; + &#50; = ?</strong>
+                </code>
+            </p>
+            </div>
+        <br />
+
+    {% elif stage == 18 %}
+        <h1>Question 18. <strong>Salted password</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p><a href="https://en.wikipedia.org/wiki/Salt_(cryptography)" target="_blank">Salted password</a> is a concatenation of the password and the salt.</p>
+                <pre>password = "33fkgu7B8eEHVw"<br />salt = "R$qR$ZRUVx9!AX"</pre>
+            </div>
+        </div>
+        <br /><br />
+        <div align="center"><img src="{{ url_for('static', filename='img/salt_and_password.jpg') }}" />
+            <p class="text-muted">Answer is a hash of salted password (MD5, SHA1 or SHA512)</p>
+        </div>
+        <br />
+
+    {% elif stage == 19 %}
+        <h1>Question 19. <strong>Large number</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p><a href="https://www.decisionproblem.com/paperclips/" target="_blank">Universal paperclip</a> doesn't relate to the answer. It's just a funny time-killer. But the information below can help.</p>
+                <small>
+                    <div class="row">
+                        <div class="col-md-3">
+                            1E+03 = 1 thousand<br />
+                            1E+04 = 10 thousand<br />
+                            1E+05 = 100 thousand<br />
+                            1E+06 = 1 million<br />
+                            1E+07 = 10 million<br />
+                            1E+08 = 100 million<br />
+                            1E+09 = 1 billion<br />
+                            1E+10 = 10 billion<br />
+                            1E+11 = 100 billion<br />
+                            1E+12 = 1 trillion<br />
+                            1E+13 = 10 trillion<br />
+                            1E+14 = 100 trillion<br />
+                            1E+15 = 1 quadrillion<br />
+                            1E+16 = 10 quadrillion<br />
+                            1E+17 = 100 quadrillion<br />
+                            1E+18 = 1 quintillion<br />
+                            1E+19 = 10 quintillion<br />
+                            1E+20 = 100 quintillion<br />
+                            1E+21 = 1 sextillion<br />
+                            1E+22 = 10 sextillion<br />
+                            1E+23 = 100 sextillion<br />
+                            1E+24 = 1 septillion<br />
+                            1E+25 = 10 septillion<br />
+                            1E+26 = 100 septillion<br />
+                            1E+27 = 1 octillion<br />
+                        </div>
+                        <div class="col-md-3">
+                            1E+28 = 10 octillion<br />
+                            1E+29 = 100 octillion<br />
+                            1E+30 = 1 nonillion<br />
+                            1E+31 = 10 nonillion<br />
+                            1E+32 = 100 nonillion<br />
+                            1E+33 = 1 decillion<br />
+                            1E+34 = 10 decillion<br />
+                            1E+35 = 100 decillion<br />
+                            1E+36 = 1 undecillion<br />
+                            1E+37 = 10 undecillion<br />
+                            1E+38 = 100 undecillion<br />
+                            1E+39 = 1 duodecillion<br />
+                            1E+40 = 10 duodecillion<br />
+                            1E+41 = 100 duodecillion<br />
+                            1E+42 = 1 tredecillion<br />
+                            1E+43 = 10 tredecillion<br />
+                            1E+44 = 100 tredecillion<br />
+                            1E+45 = 1 quattuordecillion<br />
+                            1E+46 = 10 quattuordecillion<br />
+                            1E+47 = 100 quattuordecillion<br />
+                            1E+48 = 1 quindecillion<br />
+                            1E+49 = 10 quindecillion<br />
+                            1E+50 = 100 quindecillion<br />
+                            1E+51 = 1 sexdecillion<br />
+                            1E+52 = 10 sexdecillion<br />
+                        </div>
+                        <div class="col-md-3">
+                            1E+53 = 100 sexdecillion<br />
+                            1E+54 = 1 septendecillion<br />
+                            1E+55 = 10 septendecillion<br />
+                            1E+56 = 100 septendecillion<br />
+                            1E+57 = 1 octodecillion<br />
+                            1E+58 = 10 octodecillion<br />
+                            1E+59 = 100 octodecillion<br />
+                            1E+60 = 1 novemdecillion<br />
+                            1E+61 = 10 novemdecillion<br />
+                            1E+62 = 100 novemdecillion<br />
+                            1E+63 = 1 vigintillion<br />
+                            1E+64 = 10 vigintillion<br />
+                            1E+65 = 100 vigintillion<br />
+                            1E+66 = 1 unvigintillion<br />
+                            1E+67 = 10 unvigintillion<br />
+                            1E+68 = 100 unvigintillion<br />
+                            1E+69 = 1 duovigintillion<br />
+                            1E+70 = 10 duovigintillion<br />
+                            1E+71 = 100 duovigintillion<br />
+                            1E+72 = 1 trevigintillion<br />
+                            1E+73 = 10 trevigintillion<br />
+                            1E+74 = 100 trevigintillion<br />
+                            1E+75 = 1 quattuorvigintillion<br />
+                            1E+76 = 10 quattuorvigintillion<br />
+                            1E+77 = 100 quattuorvigintillion<br />
+                        </div>
+                        <div class="col-md-3">
+                            1E+78 = 1 quinvigintillion<br />
+                            1E+79 = 10 quinvigintillion<br />
+                            1E+80 = 100 quinvigintillion<br />
+                            1E+81 = 1 sexvigintillion<br />
+                            1E+82 = 10 sexvigintillion<br />
+                            1E+83 = 100 sexvigintillion<br />
+                            1E+84 = 1 septenvigintillion<br />
+                            1E+85 = 10 septenvigintillion<br />
+                            1E+86 = 100 septenvigintillion<br />
+                            1E+87 = 1 octovigintillion<br />
+                            1E+88 = 10 octovigintillion<br />
+                            1E+89 = 100 octovigintillion<br />
+                            1E+90 = 1 novemvigintillion<br />
+                            1E+91 = 10 novemvigintillion<br />
+                            1E+92 = 100 novemvigintillion<br />
+                            1E+93 = 1 trigintillion<br />
+                            1E+94 = 10 trigintillion<br />
+                            1E+95 = 100 trigintillion<br />
+                            1E+96 = 1 untrigintillion<br />
+                            1E+97 = 10 untrigintillion<br />
+                            1E+98 = 100 untrigintillion<br />
+                            1E+99 = 1 duotrigintillion<br />
+                            1E+100 = 1 googol<br />
+                            1E+googol = 1 googolplex<br />
+                            <a href="https://en.wikipedia.org/wiki/Names_of_large_numbers" target="_blank">→ More…</a>
+                        </div>
+                    </div>
+                    </small>
+            </div>
+        </div>
+        <br />
+        <div align="center">
+            <a href="https://www.decisionproblem.com/paperclips/index2.html" target="_blank">
+                <img src="{{ url_for('static', filename='img/universal-paperclips.jpg') }}" />
+            </a>
+        </div>
+        <br />
+        <p class="lead">Please, write down number <code>999 sexdecillion 888 quindecillion 777 quattuordecillion 666 duodecillion 555 decillion 444 septillion 333 quadrillion 222 billion 900 million 1 thousand</code> using digits</p>
+        <br />
+
+    {% elif stage == 20 %}
+        <h1>Question 20. <strong>Small letter and big bodyguards</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Let's start with <a href="https://en.wikipedia.org/wiki/Exif" target="_blank">EXIF</a></p>
+            </div>
+        </div>
+        <br /><br />
+        <p class="lead">One small letter, surrounded by EXACTLY three big bodyguards on each of its sides.</p>
+        <div align="center"><img src="{{ url_for('static', filename='img/bodyguards.jpg') }}" /></div>
+        <br />
+
+
+    {% elif stage == 21 %}
+        <h1>Question 21. <strong>Scalable Vector Graphics</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Check HTML source code</p>
+                <p><a href="#spoiler-2" data-toggle="collapse" class="btn btn-default btn-xs">Show hint #2</a>
+                <div class="collapse" id="spoiler-2">
+                    <p>Delete some <a href="https://en.wikipedia.org/wiki/SVG" target="_blank">SVG</a> elements or re-order some elements to see the answer</p>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div align="center">
+               <!-- !!! Scalable Vector Graphics !!! -->
+               <svg width="800" height="600" viewBox="-200 -200 400 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <!-- Snowflake -->
+                  <path
+                    id="branch"
+                    d="
+                      M 0 0 L 0 -90
+                      M 0 -20 L 20 -34
+                      M 0 -20 L -20 -34
+                      M 0 -40 L 20 -54
+                      M 0 -40 L -20 -54
+                      M 0 -60 L 20 -74
+                      M 0 -60 L -20 -74"
+                    stroke="#E5C39C" stroke-width="3"
+                  />
+                </defs>
+
+                <!-- ANSWER - BEGIN -->
+                <polyline points="-120,60 -110,60 -100,70 -100,100 -110,110 -120,110 -120,60" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="-70,60 -90,60 -90,90 -80,90 -90,90 -90,110 -70,110" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="-40,60 -60,60 -60,90 -40,90 -40,110 -60,110" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="-10,60 -30,60 -30,110 -10,110" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="0,110 0,60 20,60 20,90 0,90 20,90 20,110" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="30,110 30,60 40,60 50,70 50,80 40,90 30,90 50,110" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="70,110 70,60 60,60 80,60" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="110,60 90,60 90,90 100,90 90,90 90,110 110,110" style="fill:none;stroke:black;stroke-width:4" />
+                <polyline points="140,60 120,60 120,90 140,90 140,110 120,110" style="fill:none;stroke:black;stroke-width:4" />
+                  <!-- ANSWER - END -->
+
+                <!-- Christmas tree -->
+                <polygon points="0,-100 200,120 -200,120" fill="#234236" />
+                <polygon points="0,-150 150,40 -150,40" fill="#0C5C4C" />
+                <polygon points="0,-190 120,-30 -120,-30" fill="#38755B" />
+                <rect x="-40" y="120" width="80" height="30" fill="brown" />
+
+                <!-- Snowflake build -->
+                <use href="#branch" />
+                <use href="#branch" transform="rotate(60)" />
+                <use href="#branch" transform="rotate(120)" />
+                <use href="#branch" transform="rotate(180)" />
+                <use href="#branch" transform="rotate(240)" />
+                <use href="#branch" transform="rotate(300)" />
+              </svg>
+        </div>
+
+    {% elif stage == 22 %}
+        <h1>Question 22. <strong>Regex Crossword</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p><a target="_blank" href="{{ url_for('static', filename='pdf/Regexp_cheatsheet_EN.pdf') }}">RegExp Cheatsheet</a></p>
+            </div>
+        </div>
+        <br />
+        <div align="center"><img src="{{ url_for('static', filename='img/regex-crossword.png') }}" /><br />
+            <a href="{{ url_for('static', filename='files/Regex-Crossword_blank.xlsx') }}">Download crossword (MS Excel, 495 Kb)</a>
+        </div>
+
+        <br />
+        <p class="lead">The answer is a word made by these letters: <code>E1, L4, D1, K2, F2, A3, J0, C2, H3, I0, B3</code>.</p>
+        <br />
+
+
+    {% elif stage == 23 %}
+        <h1><strong>Happy 2023 Year!</strong></h1>
+        <a href="#spoiler" data-toggle="collapse" class="btn btn-default btn-xs">Show hint</a>
+        <div class="collapse" id="spoiler">
+            <div class="well">
+                <p>Hmm, wait a minute…</p>
+            </div>
+        </div>
+        <br />
+        <div align="center"><img src="{{ url_for('static', filename='img/pixel-tree.gif') }}" /></div>
+        <br />
+        <p class="lead">This is the final question in <strong>{{ conf.site_title }}</strong>. Thank you very much for participating in this quest!</p>
+        <p class="lead">1. I would appreciate it if you send your <a target="_blank" href="{{ conf.url_feedback }}">feedback</a> on this quest.<br />
+                       2. Please, use <code>*******</code> keyword to complete this task. Thank you!
+        </p>
+        <br />
+
+    {% endif %}
+
+    <div class="col-md-12">
+        <div class="row">
+            {% if not isCompleted %}
+            <form class="form form-horizontal" method="post" role="form">
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.hidden_tag() }}
+                        {{ wtf.form_errors(form, hiddens="only") }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"><p class="lead">{{ form.keyword.label(class="text-muted") }}</p></div>
+                    <div class="col-md-8">{{ form.keyword(class="form-control", placeholder="Enter your answer") }}</div>
+                    <div class="col-md-2">{{ form.submit(class="btn btn-primary")}}</div>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

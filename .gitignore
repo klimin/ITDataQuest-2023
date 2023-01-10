@@ -1,0 +1,7 @@
+VENV*
+.idea
+.vscode
+__pycache__
+/data/danquest2023.db
+/logs/*.log
+.DS_Store

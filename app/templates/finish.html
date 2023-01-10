@@ -1,0 +1,463 @@
+{%  extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ conf.site_title }}{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='css/firework.css') }}" rel='stylesheet prefetch'>
+
+    <style>
+    html, body {
+      height: 100%;
+      color: white;
+    }
+
+    body {
+      background: black;
+      overflow: hidden;
+    }
+    </style>
+
+{% endblock %}
+
+{% block page_content %}
+
+<br /><br />
+<div align="center">
+    <img src="{{ url_for('static', filename='img/2023.png') }}" />
+    <br />
+        <h1>Congratulations! You've completed this quest!</h1>
+        <p class="lead">Now you can send <a target="_blank" class="text-success" href="{{ conf.url_feedback }}">feedback</a> on this quest or <br />
+          check <a href="{{ url_for('main.hiscore') }}">Hall of Fame</a> of <a href="{{ url_for('main.index') }}">{{ conf.site_title }}</a>.</p>
+    <br /><br /><br />
+    <img src="{{ url_for('static', filename='img/DanoneIT.png') }}" />
+    <br />
+    <p class="text-muted">{{ conf.site_title }} idea and development — <a href="mailto://Andrey.KLIMIN@danone.com">Andrey KLIMIN</a></p>
+    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+</div>
+<div class='wrap'>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+<div class='firework'>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+<div class='c'></div>
+</div>
+</div>
+
+{% endblock %}
+

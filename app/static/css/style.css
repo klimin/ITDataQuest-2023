@@ -1,0 +1,79 @@
+/* Top button  */
+#toTop {
+    width:80px;
+    /*border:1px solid #ccc;*/
+    /*background:#f7f7f7;*/
+    text-align:center;
+    padding:5px;
+    position:fixed;
+    bottom:20px; /* отступ кнопки от нижнего края страницы*/
+    right:20px;
+    cursor:pointer;
+    display:none;
+    /*color:#333;*/
+    /*font-size:11px;*/
+}
+
+div.no-margin p {
+    margin-bottom: 0;
+}
+
+td.break {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    padding: 0 4px;
+    height: 20px;
+    line-height: 20px;
+}
+
+.ii {
+    font:normal normal 54px itrp-icons;
+    font-size:3rem;
+    line-height:1;
+    display:inline-block;
+    text-decoration:none;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    vertical-align: middle;
+}
+
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout-danger {
+    border-left-color: #d9534f;
+}
+.bs-callout-warning {
+    border-left-color: #f0ad4e;
+}
+.bs-callout-info {
+    border-left-color: #337ab7;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout-danger h4 {
+    color: #d9534f;
+}
+.bs-callout-warning h4 {
+    color: #f0ad4e;
+}
+.bs-callout-info h4 {
+    color: #337ab7;
+}
+.bs-callout-completed {
+    color: #175f01;
+    border-color: #175f01;
+    background: rgb(236, 252, 233);
+}

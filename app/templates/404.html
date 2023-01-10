@@ -1,0 +1,25 @@
+{%  extends "base.html" %}
+
+{% block title %}{{ conf.site_title }} - Page not found{% endblock %}
+
+{% block page_content %}
+
+
+<p><a href="{{ url_for('main.index') }}">←</a> Back to <span class="lead"><a href="{{ url_for('main.index') }}">{{ conf.site_title}}</a></span></p>
+
+<div class="page-header">
+    <h1>404 Not found</h1>
+</div>
+
+    <p  class="lead">A-h-h-h-h-h! You found me! Unfortunately you have also found an elusive <strong>404 error page</strong>, which means the page you were looking for is no longer here.</p>
+
+    <span class="text-danger">
+        <small><strong>Error message</strong><br /> {{ exception }}</small>
+    </span>
+
+    <br />
+    <br />
+
+    <p align="center"><img src="{{ url_for('static', filename='img/error404.jpg') }}"></p>
+
+{% endblock %}

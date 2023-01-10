@@ -1,0 +1,83 @@
+{%  extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ conf.site_title }}{% endblock %}
+
+
+{% block page_content %}
+
+<div class="page-header">
+   <div class="row">
+       <div class="col-md-4">
+        <p><a href="{{ url_for('main.index') }}">←</a> Back to <span class="lead"><a href="{{ url_for('main.index') }}">{{ conf.site_title}}</a></span></p>
+       </div>
+       <div class="col-md-4 text-center">
+<h1 class="text-primary">Hall of Fame </h1>
+<a href="{{ url_for('main.hiscore') }}">Top 5 results</a> | <strong>All results</strong>
+       </div>
+       <div class="col-md-4 text-right">
+           <small><span class="text-muted">{{ conf.site_title}}<br />{{ conf.version }}</span><br />
+            <a href="{{ conf.url_bugreport }}" target="_blank">Send bug report</a><br />
+            {% if conf.god_mode %}<span class="text-danger">God mode enabled</span>{% endif %}</small>
+       </div>
+   </div>
+</div>
+
+<div class="row">
+   <div class="col-md-12">
+       <h4 class="text-muted">Total participants: {{ results | count }}</h4>
+   </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+        <p><strong>Rank and name</strong></p>
+    </div>
+    <div class="col-md-1">
+        <p><strong>Stage</strong></p>
+    </div>
+    <div class="col-md-5">
+        <p><strong>Elapsed time<span style="color: red;" title="Calculated from registration date to the last action"><sup>*</sup></span>{% if conf.show_wrong_answers %} + Wrong answers (if any){% endif %}</strong></p>
+    </div>
+    <div class="col-md-2">
+        <p><strong>Status</strong></p>
+    </div>
+</div>
+{% for result in results %}
+   <div class="row">
+        <div class="col-md-4">
+            <p class="lead"><span class="text-primary">{{ loop.index }}. {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% endif %} {{ result[0] }} {% if loop.index == 1 %}🏆{% endif %}</span><br />
+                <small><span class="small text-muted">{% if conf.show_email %}{{ result[6] }}{% else %}Hidden{% endif %}</span></small>
+            </p>
+        </div>
+        <div class="col-md-1">
+            <p class="lead">{{ result[1] }}</p>
+        </div>
+        <div class="col-md-5">
+            <p class="lead">{{ result[4] }}
+                {% if conf.show_wrong_answers %}
+                    <br />
+                    {% if result[8] == 0 %}
+                        <span class="small text-success"><small>No wrong answers!</small></span>
+                    {% else %}
+                        <span class="small text-muted"><small>Total wrong answers: {{ result[8] }}</small></span>
+                    {% endif %}
+                {% endif %}
+            </p>
+        </div>
+        <div class="col-md-2">
+            {% if result[5] == 'Registered' %}
+                <p class="lead"><span class="label label-default">{{ result[5] }}</span></p>
+            {% elif result[5] == 'In progress' %}
+                <p class="lead"><span class="label label-primary">{{ result[5] }}</span></p>
+            {% elif result[5] == 'Completed' %}
+                <p class="lead"><span class="label label-success">{{ result[5] }}</span></p>
+            {% endif %}
+        </div>
+   </div>
+{% endfor %}
+
+{% endblock %}
+

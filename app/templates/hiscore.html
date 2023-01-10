@@ -1,0 +1,68 @@
+{%  extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ conf.site_title }}{% endblock %}
+
+
+{% block page_content %}
+
+<div class="page-header">
+   <div class="row">
+       <div class="col-md-4">
+           <p><a href="{{ url_for('main.index') }}">←</a> Back to <span class="lead"><a href="{{ url_for('main.index') }}">{{ conf.site_title}}</a></span></p>
+       </div>
+       <div class="col-md-4 text-center">
+<h1 class="text-primary">Hall of Fame</h1>
+<strong>Top 5 results</strong> | <a href="{{ url_for('main.hiscore_all') }}">All results</a>
+       </div>
+       <div class="col-md-4 text-right">
+           <small><span class="text-muted">{{ conf.site_title}}<br />{{ conf.version }}</span><br />
+            <a href="{{ conf.url_bugreport }}" target="_blank">Send bug report</a><br />
+            {% if conf.god_mode %}<span class="text-danger">God mode enabled</span>{% endif %}</small>
+       </div>
+   </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+        <p><strong>Rank and name</strong></p>
+    </div>
+    <div class="col-md-1">
+        <p><strong>Stage</strong></p>
+    </div>
+    <div class="col-md-5">
+        <p><strong>Elapsed time<span style="color: red;" title="Calculated from registration date to the last action"><sup>*</sup></span></strong></p>
+    </div>
+    <div class="col-md-2">
+        <p><strong>Status</strong></p>
+    </div>
+</div>
+{% for result in results %}
+   <div class="row">
+        <div class="col-md-4">
+            <p class="lead"><span class="text-primary">{{ loop.index }}. {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% endif %} {{ result[0] }} {% if loop.index == 1 %}🏆{% endif %}</span><br />
+                <small><span class="small text-muted">{% if conf.show_email %}{{ result[6] }}{% else %}Hidden{% endif %}</span></small>
+            </p>
+        </div>
+        <div class="col-md-1">
+            <p class="lead">{{ result[1] }}</p>
+        </div>
+        <div class="col-md-5">
+            <p class="lead">{{ result[4] }}</p>
+        </div>
+        <div class="col-md-2">
+            {% if result[5] == 'Registered' %}
+                <p class="lead"><span class="label label-default">{{ result[5] }}</span></p>
+            {% elif result[5] == 'In progress' %}
+                <p class="lead"><span class="label label-primary">{{ result[5] }}</span></p>
+            {% elif result[5] == 'Completed' %}
+                <p class="lead"><span class="label label-success">{{ result[5] }}</span></p>
+            {% endif %}
+        </div>
+   </div>
+{% endfor %}
+
+{% endblock %}
+

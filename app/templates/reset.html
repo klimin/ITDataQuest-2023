@@ -1,0 +1,13 @@
+{%  extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ conf.site_title }}{% endblock %}
+
+
+{% block page_content %}
+
+<br /><br /><br /><br /><br />
+Please, <a href="{{ url_for('main.confirm') }}">confirm</a> to reset all progress… or <a href="{{ url_for('main.index') }}">continue</a> to solve the puzzles.
+
+{% endblock %}
+
